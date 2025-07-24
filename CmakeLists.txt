@@ -1,0 +1,72 @@
+cmake_minimum_required(VERSION 3.21)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_TOOLCHAIN_FILE $ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
+
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+project(demo VERSION 1.1.1 LANGUAGES CXX)
+
+find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
+
+find_package(PkgConfig)
+pkg_check_modules(POPPLER_CPP REQUIRED IMPORTED_TARGET poppler-cpp)
+
+
+file(GLOB_RECURSE PROJECT_SOURCES
+    src/*.cpp
+    src/*.h
+)
+
+qt_add_executable(demo MACOSX_BUNDLE
+    MANUAL_FINALIZATION
+    ${PROJECT_SOURCES}
+
+)
+
+target_link_libraries(demo PRIVATE
+    Qt6::Widgets
+    PkgConfig::POPPLER_CPP
+)
+
+if(WIN32)
+    include_directories(
+    /build/vcpkg_installed/x64-windows/include/poppler/qt6
+    )
+endif()
+
+# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
+# If you are developing for iOS or macOS you should consider setting an
+# explicit, fixed bundle identifier manually though.
+if(${QT_VERSION} VERSION_LESS 6.1.0)
+    set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.demo)
+endif()
+set_target_properties(demo PROPERTIES
+    ${BUNDLE_ID_OPTION}
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+)
+
+include(GNUInstallDirs)
+install(TARGETS demo
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+if(WIN32)
+    add_custom_command(
+        TARGET demo
+        POST_BUILD
+        COMMAND Qt6::windeployqt
+        ARGS $<TARGET_FILE:demo>
+    )
+endif()

@@ -1,0 +1,6 @@
+.cache
+build
+out
+.vscode
+*.user
+vcpkg_installed

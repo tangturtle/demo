@@ -1,0 +1,15 @@
+{
+    "name": "demo",
+    "dependencies": [
+        {
+            "name": "pkgconf",
+            "host": true
+        },
+        {
+            "name": "poppler",
+            "features": [
+                "qt"
+            ]
+        }
+    ]
+}
