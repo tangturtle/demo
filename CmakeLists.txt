@@ -16,7 +16,7 @@ find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 find_package(PkgConfig)
-pkg_check_modules(POPPLER_CPP REQUIRED IMPORTED_TARGET poppler-cpp)
+pkg_check_modules(POPPLER_QT6 REQUIRED IMPORTED_TARGET poppler-qt6)
 
 
 file(GLOB_RECURSE PROJECT_SOURCES
@@ -32,14 +32,10 @@ qt_add_executable(demo MACOSX_BUNDLE
 
 target_link_libraries(demo PRIVATE
     Qt6::Widgets
-    PkgConfig::POPPLER_CPP
+    PkgConfig::POPPLER_QT6
 )
 
-if(WIN32)
-    include_directories(
-    /build/vcpkg_installed/x64-windows/include/poppler/qt6
-    )
-endif()
+
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
